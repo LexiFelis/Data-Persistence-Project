@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
+// Came with project files, kept it on main scene and let it handle the gameplay only. Added score saving functionality.
+// Hate the fact that the official unity exercise comes with capitalised variables.
+
 public class MainManager : MonoBehaviour
 {
     public Brick BrickPrefab;
@@ -11,14 +14,22 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text hiScoreText;
     public GameObject GameOverText;
+    public GameObject scoreManager;
     
     private bool m_Started = false;
     private int m_Points;
     
     private bool m_GameOver = false;
 
-    
+    // Loads current hi-score
+    private void Awake()
+    {
+        scoreManager = GetComponent<GameObject>();
+        SetHiScore();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -72,5 +83,27 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+
+        // If the current score is higher than the saved hi-score, then set new hi-score
+        if (m_Points > ScoreManager.hiScore)
+        {
+            ScoreManager.currentScore = m_Points;
+            ScoreManager.SaveScore(ScoreManager.currentName, ScoreManager.currentScore);
+            SetHiScore();
+        }        
+        // Creates new object from Scores class (to be used if high-score table is implemented)
+       // ScoreManager.ScoreEntry();        
+    }
+
+    // Loads current Hi-score and sets the text at the top of the game.
+    public void SetHiScore()
+    {
+        ScoreManager.LoadScore();
+        hiScoreText.text = "Best Score: " + ScoreManager.hiScoreName + ": " + ScoreManager.hiScore;
+    }
+
+    public void MainMenu()
+    {
+        SceneManager.LoadScene(0);
     }
 }
